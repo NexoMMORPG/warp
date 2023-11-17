@@ -1,6 +1,7 @@
 /**************************************************************************\
 *                                                                          *
 *   Copyright (C) 2021 Neo-Mind                                            *
+*   Copyright (C) 2023-2024 X-EcutiOnner (xex.ecutionner@gmail.com)        *
 *                                                                          *
 *   This file is a part of WARP project                                    *
 *                                                                          *
@@ -20,9 +21,9 @@
 *                                                                          *
 |**************************************************************************|
 *                                                                          *
-*   Author(s)     : Neo-Mind                                               *
+*   Author(s)     : Neo-Mind, X-EcutiOnner                                 *
 *   Created Date  : 2021-08-20                                             *
-*   Last Modified : 2021-08-20                                             *
+*   Last Modified : 2024-01-24                                             *
 *                                                                          *
 \**************************************************************************/
 
@@ -48,12 +49,12 @@ var Hex;    //It's hex in Little Endian form
 ///
 export function init()
 {
-	Value  = -1;
-	Hex    = '';
-	Valid  = null;
-	ErrMsg = null;
+    Value  = -1;
+    Hex    = '';
+    Valid  = null;
+    ErrMsg = null;
 
-	Identify(self, ['init', 'load', 'toString', 'valueOf']);
+    Identify(self, ['init', 'load', 'toString', 'valueOf']);
 }
 
 ///
@@ -61,44 +62,45 @@ export function init()
 ///
 export function load()
 {
-	const _ = Log.dive(self, 'load');
+    const _ = Log.dive(self, 'load');
 
-	$$(_ + '1.1 - Check if load was already called')
-	if (Valid != null)
-	{
-		$$(_ + '1.2 - Check for errors and report them again if present otherwise simply return')
-		Log.rise();
+    $$(_ + '1.1 - Check if load was already called')
+    if (Valid != null)
+    {
+        $$(_ + '1.2 - Check for errors and report them again if present otherwise simply return')
+        Log.rise();
 
-		if (Valid)
-			return Valid;
-		else
-			throw ErrMsg;
-	}
+        if (Valid)
+            return Valid;
+        else
+            throw ErrMsg;
+    }
 
-	$$(_ + '1.3 - Initialize \'Valid\' to false')
-	Valid = false;
+    $$(_ + '1.3 - Initialize \'Valid\' to false')
+    Valid = false;
 
-	$$(_ + '1.4 - Find the string "sakray"')
-	let addr = Exe.FindText("sakray");
-	if (addr < 0)
-		throw Log.rise(ErrMsg = new Error(`${self} - 'sakray' not found`));
+    $$(_ + '1.4 - Find the string "servertype"')
+    const StrReg = Exe.BuildDate <= 20230607 ? "sakray" : "servertype";
+    let addr = Exe.FindText(StrReg);
+    if (addr < 0)
+        throw Log.rise(ErrMsg = new Error(`${self} - 'g_serverType' not found`));
 
-	$$(_ + '1.5 - Find where its used in a PUSH')
-	addr = Exe.FindHex( PUSH(addr) );
-	if (addr < 0)
-		throw Log.rise(ErrMsg = new Error(`${self} - 'sakray' not used`));
+    $$(_ + '1.5 - Find where its used in a PUSH')
+    addr = Exe.FindHex(PUSH(addr));
+    if (addr < 0)
+        throw Log.rise(ErrMsg = new Error(`${self} - 'g_serverType' not used`));
 
-	$$(_ + '1.6 - Find an assignment to g_serverType after it')
-	addr = Exe.FindHex( MOV([POS4WC], 1), addr + 5); //mov dword ptr [g_serverType], 1
-	if (addr < 0)
-		throw Log.rise(ErrMsg = new Error(`${self} - g_serverType not assigned`));
+    $$(_ + '1.6 - Find an assignment to g_serverType after it')
+    addr = Exe.FindHex(MOV([POS4WC], 1), addr + 5); //mov dword ptr [g_serverType], 1
+    if (addr < 0)
+        throw Log.rise(ErrMsg = new Error(`${self} - g_serverType not assigned`));
 
-	$$(_ + '2.1 - Extract the address to \'Value\' & save its hex')
-	Value = Exe.GetUint32(addr + 2);
-	Hex   = Value.toHex(4);
+    $$(_ + '2.1 - Extract the address to \'Value\' & save its hex')
+    Value = Exe.GetUint32(addr + 2);
+    Hex = Value.toHex(4);
 
-	$$(_ + '2.2 - Set validity to true')
-	return Log.rise(Valid = true);
+    $$(_ + '2.2 - Set validity to true')
+    return Log.rise(Valid = true);
 }
 
 ///
@@ -106,7 +108,7 @@ export function load()
 ///
 export function toString()
 {
-	return Hex;
+    return Hex;
 }
 
 ///
@@ -114,5 +116,5 @@ export function toString()
 ///
 export function valueOf()
 {
-	return Value;
+    return Value;
 }
