@@ -71,7 +71,7 @@ CustomNW:
         - NoHardCodedAddr:
             title : Remove hardcoded address/port
             recommend : yes
-            author :  Andrei Karas (4144)
+            author :  Andrei Karas (4144) , X-EcutiOnner
             desc : Remove hardcoded connection addresses and ports.
         
         - EnableHttpEmblem:
